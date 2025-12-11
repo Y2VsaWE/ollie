@@ -12,7 +12,7 @@ import {
   IonFab, IonFabButton, IonIcon, IonButtons, IonModal 
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addOutline, createOutline, trashOutline, libraryOutline, bookOutline, bookmarkOutline, checkmarkDoneOutline } from 'ionicons/icons';
+import { addOutline, createOutline, trashOutline, libraryOutline, bookOutline, bookmarkOutline, checkmarkDoneOutline, star, starOutline } from 'ionicons/icons';
 
 import { EditProgressComponent } from 'src/app/components/edit-progress/edit-progress.component'; 
 import { AddBookComponent } from 'src/app/components/add-book/add-book.component';
@@ -46,7 +46,7 @@ export class LibraryPage implements OnInit {
     private bookService: BookService,
     private modalCtrl: ModalController
   ) {
-    addIcons({libraryOutline,bookOutline,bookmarkOutline,checkmarkDoneOutline,createOutline,trashOutline,addOutline});
+    addIcons({libraryOutline,bookOutline,bookmarkOutline,checkmarkDoneOutline,createOutline,trashOutline,addOutline,star,starOutline});
   }
 
   async ngOnInit() {
@@ -111,5 +111,18 @@ export class LibraryPage implements OnInit {
       this.alertMessage = 'Book successfully added!';
       this.showAlert = true;
     }
+  }
+
+  getStars(rating: number | null): string[] {
+    if (rating === null || rating === undefined) {
+      return [];
+    }
+    const fullStars = Math.floor(rating);
+    const emptyStars = 5 - fullStars;
+    
+    return [
+      ...Array(fullStars).fill('star'),
+      ...Array(emptyStars).fill('star-outline')
+    ];
   }
 }
