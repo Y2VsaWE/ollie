@@ -78,4 +78,20 @@ export class BookService {
           throw error;
       }
   }
+
+  async updateTotalProgress(bookId: string, newPage: number, totalTimeSeconds: number) {
+    const { data, error } = await this.supabase
+        .from('book')
+        .update({ 
+            current_page: newPage,
+            total_reading_time: totalTimeSeconds // Hier wird die neue GESAMTzeit gesetzt
+        })
+        .eq('id', bookId)
+        .select();
+
+    if (error) {
+        throw error;
+    }
+    return data;
+}
 }

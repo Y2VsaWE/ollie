@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar color="secondary">
+    <ion-title>Edit Progress: {{ book.title }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <p>Update your reading progress manually.</p>
+  
+  <ion-item>
+    <ion-label position="floating">Current Page (of {{ book.total_pages }})</ion-label>
+    <ion-input type="number" 
+               min="{{ book.current_page }}" 
+               [max]="book.total_pages"
+               [(ngModel)]="newPageInput" 
+               required>
+    </ion-input>
+  </ion-item>
+  
+  <ion-item>
+    <ion-label position="floating">Total Reading Time (in Minutes)</ion-label>
+    <ion-input type="number" 
+               min="0" 
+               [(ngModel)]="newTimeInputMinutes" 
+               required>
+    </ion-input>
+  </ion-item>
+  
+  <ion-button expand="block" 
+              class="ion-margin-top" 
+              color="primary" 
+              [disabled]="newPageInput > book.total_pages || newPageInput < 0"
+              (click)="saveChanges()">
+    Save Manual Changes
+  </ion-button>
+</ion-content>

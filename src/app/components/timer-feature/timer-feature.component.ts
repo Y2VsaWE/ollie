@@ -39,29 +39,24 @@ export class TimerFeatureComponent implements OnInit, OnDestroy {
 
   // Variablen für die Timer-Logik
   isTimerRunning: boolean = false;
-  currentSessionTime: number = 0; // Zeit in Sekunden
-  newPageInput: number | undefined; // Eingabefeld für die neue Seite
+  currentSessionTime: number = 0; // in seconds
+  newPageInput: number | undefined; // 
 
   private timerInterval: any;
-  private startTime: number = 0; // UNIX-Timestamp der Startzeit
+  private startTime: number = 0; 
 
   constructor(private bookService: BookService) { }
 
   async ngOnInit() {
-    this.newPageInput = this.currentPage; // Setzt den Input auf die aktuelle Seite
-
-    // Lädt den Timer-Status beim Start der App
+    this.newPageInput = this.currentPage; 
     await this.loadTimerState();
   }
 
   ngOnDestroy() {
-    // Stoppt das Interval, wenn die Komponente zerstört wird, um Memory Leaks zu vermeiden
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
     }
   }
-
-  // --- Lade- und Speicherfunktionen für den Timer-Status (mit Capacitor Preferences) ---
 
   private async loadTimerState() {
     const runningResult = await Preferences.get({ key: TIMER_RUNNING_KEY });
@@ -95,10 +90,7 @@ export class TimerFeatureComponent implements OnInit, OnDestroy {
       if (this.currentSessionTime === 0) {
         // Wenn der Timer neu startet, setzen Sie die Startzeit auf jetzt
         this.startTime = Date.now();
-      } else {
-        // Wenn der Timer nach einer Pause fortgesetzt wird, korrigieren Sie die Startzeit
-        // (Wird bei dieser simplen Implementierung ignoriert, da wir nur die verstrichene Zeit zählen)
-      }
+      } 
 
       this.saveTimerState();
       this.startTimerInterval();
@@ -107,6 +99,7 @@ export class TimerFeatureComponent implements OnInit, OnDestroy {
       this.saveTimerState(); // Speichert den aktuellen Zustand (isTimerRunning=false)
       if (this.timerInterval) {
         clearInterval(this.timerInterval);
+        this.timerInterval = null;
       }
     }
   }
