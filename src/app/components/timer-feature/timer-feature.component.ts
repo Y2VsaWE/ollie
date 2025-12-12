@@ -10,6 +10,8 @@ import {
   IonCard, IonInput, IonButton, IonIcon, IonCardHeader, IonCardTitle, 
   IonCardContent, IonCardSubtitle, IonItem, IonLabel
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { pauseOutline, playOutline, saveOutline } from 'ionicons/icons';
 
 
 // Konstanten für Preferences Keys
@@ -45,7 +47,9 @@ export class TimerFeatureComponent implements OnInit, OnDestroy {
   private timerInterval: any;
   private startTime: number = 0; 
 
-  constructor(private bookService: BookService) { }
+  constructor(private bookService: BookService) {
+    addIcons({saveOutline,pauseOutline,playOutline});
+  }
 
   async ngOnInit() {
     this.newPageInput = this.currentPage; 

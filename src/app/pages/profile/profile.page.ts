@@ -1,11 +1,9 @@
-// src/app/pages/profile/profile.page.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Preferences } from '@capacitor/preferences'; // Zum Speichern der Einstellung
 import { 
   IonContent, IonHeader, IonTitle, IonToolbar, IonToggle, IonItem, IonLabel, 
-  IonList, IonListHeader 
-} from '@ionic/angular/standalone';
+  IonList, IonListHeader, IonButtons } from '@ionic/angular/standalone';
 import { LocalNotifications } from '@capacitor/local-notifications';
 
 const DARK_MODE_KEY = 'darkMode';
@@ -15,7 +13,7 @@ const DARK_MODE_KEY = 'darkMode';
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonButtons, 
     CommonModule, 
     IonContent, IonHeader, IonTitle, IonToolbar, IonToggle, IonItem, 
     IonLabel, IonList, IonListHeader

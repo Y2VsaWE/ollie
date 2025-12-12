@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular/standalone';
+import { ModalController, IonButtons } from '@ionic/angular/standalone';
 import { BookService } from 'src/app/services/book.service';
 import { Book } from 'src/app/data/Book';
 import { IonHeader, IonToolbar, IonTitle, IonButton, IonContent, IonCardTitle, IonCardContent, IonCard, IonCardHeader, IonIcon } from '@ionic/angular/standalone';
@@ -7,13 +7,14 @@ import { CurrentReadComponent } from 'src/app/components/current-read/current-re
 import { TimerFeatureComponent} from 'src/app/components/timer-feature/timer-feature.component';
 import { CommonModule } from '@angular/common';
 import { ReviewComponent } from 'src/app/components/review/review.component';
-import { EditProgressComponent } from 'src/app/components/edit-progress/edit-progress.component';
+import { addIcons } from 'ionicons';
+import { checkboxOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  imports: [ IonIcon, IonCardHeader, IonCard, IonCardContent, IonCardTitle, IonContent, IonHeader, IonToolbar, IonTitle, IonButton, CurrentReadComponent, TimerFeatureComponent, CommonModule]
+  imports: [IonButtons,  IonIcon, IonCardHeader, IonCard, IonCardContent, IonCardTitle, IonContent, IonHeader, IonToolbar, IonTitle, IonButton, CurrentReadComponent, TimerFeatureComponent, CommonModule]
 })
 export class HomePage implements OnInit {
   currentBook: Book | null = null;
@@ -21,7 +22,9 @@ export class HomePage implements OnInit {
   constructor(
       private bookService: BookService,
       private modalCtrl: ModalController,
-  ) { }
+  ) {
+    addIcons({checkboxOutline});
+  }
   
   ngOnInit() {
     this.loadCurrentBook();
@@ -50,7 +53,7 @@ export class HomePage implements OnInit {
     const { role } = await modal.onWillDismiss();
 
     if (role === 'confirm') {
-      this.loadCurrentBook(); // Lädt das Dashboard neu
+      this.loadCurrentBook();
     }
   }
 

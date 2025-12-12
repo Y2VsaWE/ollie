@@ -33,4 +33,5 @@ export interface BookInsert {
     user_id?: string | null;
     cover_url?: string | null;
     review_text?: string | null;
+    cover_image_base64?: string |null;
 }

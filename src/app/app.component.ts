@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
-import { NetworkService } from './services/network.service'; // <-- NEU
-import { ToastController } from '@ionic/angular/standalone'; // <-- NEU
+import { NetworkService } from './services/network.service';
+import { ToastController } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { cloudOfflineOutline, cloudDoneOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +15,9 @@ export class AppComponent {
   constructor(
     private networkService: NetworkService,
     private toastCtrl: ToastController
-  ) {}
+  ) {
+    addIcons({cloudOfflineOutline, cloudDoneOutline});
+  }
 
   ngOnInit() {
     this.networkService.onlineStatus$.subscribe(isConnected => {
@@ -29,7 +33,7 @@ export class AppComponent {
     const toast = await this.toastCtrl.create({
       message: 'You are currently **offline**. Some features may not be available.',
       duration: 5000,
-      position: 'bottom',
+      position: 'top',
       color: 'danger',
       icon: 'cloud-offline-outline'
     });
@@ -39,10 +43,10 @@ export class AppComponent {
   async showOnlineToast() {
     const toast = await this.toastCtrl.create({
       message: 'You are back online.',
-      duration: 5000,
-      position: 'bottom',
+      duration: 2000,
+      position: 'top',
       color: 'success',
-      icon: 'cloud-online-outline'
+      icon: 'cloud-done-outline'
     });
     toast.present();
   }
