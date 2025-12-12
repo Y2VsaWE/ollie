@@ -11,7 +11,8 @@ export interface Book {
     total_reading_time: number; 
     
     cover_url: string | null; // Link zum Cover-Bild in Supabase Storage
-    
+    cover_image_base64: string |null;
+
     review_text: string | null;
     rating: number;
     

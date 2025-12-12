@@ -1,66 +1,86 @@
-// src/app/components/edit-progress/edit-progress.component.ts
+// src/app/components/edit-book/edit-book.component.ts (KOMBINIERTE VERSION)
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Book } from 'src/app/data/Book';
-import { BookService} from 'src/app/services/book.service';
+import { BookService } from 'src/app/services/book.service';
 import { 
   IonHeader, IonToolbar, IonTitle, IonContent, IonButton, 
-  IonItem, IonLabel, IonInput, ModalController, IonButtons,
-  IonSelect, IonSelectOption // Wichtig: IonSelect und Option hinzufügen
+  IonItem, IonLabel, IonInput, IonTextarea, ModalController, IonButtons, 
+  IonSelect, IonSelectOption, IonIcon, IonCard, IonImg, IonListHeader
 } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common'; // Für pipes wie titlecase
+import { CommonModule } from '@angular/common'; 
+import { addIcons } from 'ionicons';
+import { star, starOutline, trashOutline, /* ... */ } from 'ionicons/icons'; 
+import { ToastController } from '@ionic/angular/standalone';
+
 
 @Component({
   selector: 'app-edit-progress',
   templateUrl: './edit-progress.component.html',
   styleUrls: ['./edit-progress.component.scss'],
+  standalone: true,
   imports: [
     CommonModule, FormsModule, 
     IonButtons, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, 
-    IonItem, IonLabel, IonInput, IonSelect, IonSelectOption // Importe aktualisiert
+    IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonIcon, 
+    IonTextarea, IonCard, IonImg, IonListHeader
   ],
-  standalone: true,
 })
-export class EditProgressComponent {
-  
+export class EditProgressComponent implements OnInit {
+
   @Input() book!: Book; 
   
-  // Die Modelle spiegeln die aktuellen Daten wider (Seite & Zeit)
   newPageInput: number = 0;
   newTimeInputMinutes: number = 0;
-
-  // Neue Modelle für Buchdetails
   newStatus: string = '';
   newGenre: string = '';
   newFormat: string = '';
 
-  // Listen für Selects
+  // Modelle für Review/Rating/Bild
+  currentRating: number = 0;
+  deleteImage: boolean = false; 
+
+  // Listen
   genres = ['Fiction', 'Non-Fiction', 'Fantasy', 'Science Fiction', 'Thriller', 'Mystery', 'Romance', 'Other'];
   formats = ['physical', 'ebook', 'audiobook'];
   statuses = ['Want to read', 'Currently reading', 'Read'];
 
   constructor(
     private modalCtrl: ModalController,
-    private bookService: BookService
-  ) {}
+    private bookService: BookService,
+    private toastCtrl: ToastController,
+  ) {
+    addIcons({ star, starOutline, trashOutline }); 
+  }
 
-  ionViewWillEnter() {
-    // Initialisiert alle Felder mit den aktuellen Buchwerten
+  ngOnInit() {
+    // Initialisierung der Felder beim Laden
     this.newPageInput = this.book.current_page;
     this.newTimeInputMinutes = Math.floor(this.book.total_reading_time / 60);
-    
-    // Initialisierung der neuen Felder
     this.newStatus = this.book.status;
     this.newGenre = this.book.genre;
     this.newFormat = this.book.format;
+    this.currentRating = this.book.rating || 0;
   }
 
+  setRating(newRating: number) {
+    if (newRating === this.currentRating) {
+        this.currentRating = 0;
+    } else {
+        this.currentRating = newRating;
+    }
+}
+
+  removeImage() {
+    this.deleteImage = true;
+  }
+  
   closeModal() {
     this.modalCtrl.dismiss(null, 'cancel');
   }
 
-  async saveChanges() {
+  async updateBook() {
     if (this.newPageInput < 0 || this.newPageInput > this.book.total_pages) {
       alert('Page number is invalid.');
       return;
@@ -68,33 +88,44 @@ export class EditProgressComponent {
     
     const timeInSeconds = this.newTimeInputMinutes * 60;
     
-    const updates: any = {
+    let updatedData: any = {
+      // Hauptdetails (direkt an book.property gebunden)
+      title: this.book.title,
+      author: this.book.author,
+      total_pages: this.book.total_pages, // Muss auch editierbar sein, falls nötig
+      
+      // Metadaten und Fortschritt (an newXProperty gebunden)
       status: this.newStatus,
       genre: this.newGenre,
       format: this.newFormat,
       current_page: this.newPageInput,
       total_reading_time: timeInSeconds,
+      
+      // Review
+      rating: this.currentRating > 0 ? this.currentRating : null,
+      review_text: this.book.review_text || null, 
     };
     
-    // Wenn der Status auf 'Read' gesetzt wird, sollte die Seite auf das Maximum gesetzt werden.
+    // Logik: Status 'Read' -> Seite auf Maximum setzen
     if (this.newStatus === 'Read') {
-        updates.current_page = this.book.total_pages;
+        updatedData.current_page = this.book.total_pages;
     } 
-    // Logik: Wenn der Status von 'Read' auf etwas anderes zurückgesetzt wird, muss die Seite erhalten bleiben
-    // oder, falls die Seite 0 ist, auf 0 bleiben. Dies wird durch das newPageInput abgedeckt.
     
-    try {
-      await this.bookService.updateBookDetails(
-        this.book.id, 
-        updates
-      );
+    // Logik: Bild löschen
+    if (this.deleteImage) {
+      updatedData.cover_image_base64 = null;
+    }
 
-      this.modalCtrl.dismiss(null, 'confirm'); 
+    try {
+      await this.bookService.updateBookDetails(this.book.id, updatedData);
+      
+      // Führe das lokale Buchobjekt mit den Updates zusammen
+      this.modalCtrl.dismiss(null, 'confirm');
 
     } catch (e) {
-      console.error('Error updating manual book details:', e);
-      alert('Error updating details.');
-      this.modalCtrl.dismiss(null, 'error');
+      console.error('Error updating book:', e);
+      alert('Error updating book.');
     }
   }
+
 }

@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Edit Book</ion-title>
+    <ion-title>Edit: {{ book.title }}</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="closeModal()">Cancel</ion-button>
     </ion-buttons>
@@ -9,60 +9,121 @@
 
 <ion-content class="ion-padding">
   
-  <h2>Details</h2>
-
-  <ion-item>
-    <ion-label position="floating">Status</ion-label>
-    <ion-select [(ngModel)]="newStatus" name="status">
-      @for (s of statuses; track s) {
-        <ion-select-option [value]="s">{{ s }}</ion-select-option>
-      }
-    </ion-select>
-  </ion-item>
-
-  <ion-item>
-    <ion-label position="floating">Genre</ion-label>
-    <ion-select [(ngModel)]="newGenre" name="genre">
-      @for (g of genres; track g) {
-        <ion-select-option [value]="g">{{ g }}</ion-select-option>
-      }
-    </ion-select>
-  </ion-item>
-
-  <ion-item>
-    <ion-label position="floating">Format</ion-label>
-    <ion-select [(ngModel)]="newFormat" name="format">
-      @for (f of formats; track f) {
-        <ion-select-option [value]="f">{{ f | titlecase }}</ion-select-option>
-      }
-    </ion-select>
-  </ion-item>
+  @if (book.cover_image_base64 && !deleteImage) {
+    <ion-card class="ion-margin-bottom">
+      <ion-img [src]="book.cover_image_base64" 
+               alt="Book Cover" 
+               style="max-height: 300px; object-fit: contain;"></ion-img>
+      
+      <ion-button expand="full" color="danger" (click)="removeImage()">
+        <ion-icon name="trash-outline" slot="start"></ion-icon>
+        Remove Cover Image
+      </ion-button>
+    </ion-card>
+  }
   
-  <h2 class="ion-margin-top">Progress</h2>
+  @if (deleteImage) {
+    <p class="ion-text-center ion-padding" style="color: var(--ion-color-danger)">
+      *Cover image will be permanently deleted upon saving.* <ion-button fill="clear" color="secondary" (click)="deleteImage = false">
+        Undo
+      </ion-button>
+    </p>
+  }
 
-  <ion-item>
-    <ion-label position="floating">Current Page (Max: {{ book?.total_pages }})</ion-label>
-    <ion-input type="number" 
-               [min]="0" 
-               [max]="book?.total_pages"
-               [(ngModel)]="newPageInput" 
-               name="page">
-    </ion-input>
-  </ion-item>
-  
-  <ion-item>
-    <ion-label position="floating">Total Reading Time (Minutes)</ion-label>
-    <ion-input type="number" 
-               min="0"
-               [(ngModel)]="newTimeInputMinutes" 
-               name="time">
-    </ion-input>
-  </ion-item>
+  <form (ngSubmit)="updateBook()">
+      
+      <h2 class="ion-margin-top">General Details</h2>
+      
+      <ion-item>
+          <ion-label position="floating">Title</ion-label>
+          <ion-input [(ngModel)]="book.title" name="title"></ion-input>
+      </ion-item>
+      
+      <ion-item>
+          <ion-label position="floating">Author</ion-label>
+          <ion-input [(ngModel)]="book.author" name="author"></ion-input>
+      </ion-item>
+      
+      <ion-item>
+          <ion-label position="floating">Total Pages</ion-label>
+          <ion-input type="number" min="1" [(ngModel)]="book.total_pages" name="totalPages"></ion-input>
+      </ion-item>
+      
+      <h2 class="ion-margin-top">Metadata</h2>
 
-  <ion-button expand="block" 
-              class="ion-margin-top" 
-              color="secondary" 
-              (click)="saveChanges()">
-    Save All Changes
-  </ion-button>
+      <ion-item>
+        <ion-label position="floating">Status</ion-label>
+        <ion-select [(ngModel)]="newStatus" name="status">
+          @for (s of statuses; track s) {
+            <ion-select-option [value]="s">{{ s }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Genre</ion-label>
+        <ion-select [(ngModel)]="newGenre" name="genre">
+          @for (g of genres; track g) {
+            <ion-select-option [value]="g">{{ g }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Format</ion-label>
+        <ion-select [(ngModel)]="newFormat" name="format">
+          @for (f of formats; track f) {
+            <ion-select-option [value]="f">{{ f | titlecase }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+      
+      <h2 class="ion-margin-top">Progress</h2>
+
+      <ion-item>
+        <ion-label position="floating">Current Page (Max: {{ book?.total_pages }})</ion-label>
+        <ion-input type="number" 
+                   [min]="0" 
+                   [max]="book?.total_pages"
+                   [(ngModel)]="newPageInput" 
+                   name="page">
+        </ion-input>
+      </ion-item>
+      
+      <ion-item>
+        <ion-label position="floating">Total Reading Time (Minutes)</ion-label>
+        <ion-input type="number" 
+                   min="0"
+                   [(ngModel)]="newTimeInputMinutes" 
+                   name="time">
+        </ion-input>
+      </ion-item>
+      
+      <ion-list-header class="ion-margin-top">
+        <ion-label>Review & Rating</ion-label>
+      </ion-list-header>
+
+      <ion-item lines="none" class="ion-padding-start">
+        Your Rating:
+        <div>
+          @for (star of [1, 2, 3, 4, 5]; track star) {
+            <ion-icon 
+                [name]="star <= currentRating ? 'star' : 'star-outline'" 
+                color="warning" 
+                (click)="setRating(star)" 
+                style="font-size: 24px; cursor: pointer;">
+            </ion-icon>
+          }
+        </div>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Review Text</ion-label>
+        <ion-textarea rows="4" [(ngModel)]="book.review_text" name="review"></ion-textarea>
+      </ion-item>
+
+      <ion-button expand="block" class="ion-margin-top" color="primary" type="submit">
+          Save All Changes
+      </ion-button>
+  </form>
 </ion-content>

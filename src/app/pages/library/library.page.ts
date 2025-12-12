@@ -27,9 +27,7 @@ import { AddBookComponent } from 'src/app/components/add-book/add-book.component
     IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem,
     IonLabel, IonButton, IonAlert, IonBadge, IonSegment, IonSegmentButton,
     IonFab, IonFabButton, IonIcon, IonButtons, IonModal,
-    EditProgressComponent // Importiert den Modal
-    // AddBookModalComponent (muss noch erstellt werden)
-    , AddBookComponent]
+    EditProgressComponent, AddBookComponent]
 })
 export class LibraryPage implements OnInit {
   
@@ -44,7 +42,8 @@ export class LibraryPage implements OnInit {
   
   constructor(
     private bookService: BookService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+
   ) {
     addIcons({libraryOutline,bookOutline,bookmarkOutline,checkmarkDoneOutline,createOutline,trashOutline,addOutline,star,starOutline});
   }
@@ -84,16 +83,20 @@ export class LibraryPage implements OnInit {
 
   // --- EDIT BUCH MODAL (Aktualisiert Status, Genre, etc.) ---
   async editBookModal(book: Book) {
-    // Da wir das EditProgressModal bereits erstellt haben, verwenden wir es
-    // und fügen später die Logik für Status/Genre-Änderungen hinzu.
     const modal = await this.modalCtrl.create({
-      component: EditProgressComponent, // Wir verwenden das EditProgressModal auch für allgemeine Edits
+      component: EditProgressComponent,
       componentProps: {
         book: book
       }
     });
 
     await modal.present();
+    // const { role } = await modal.onWillDismiss(); // Warten auf das Schließen
+
+    // // Prüfen, ob das Signal 'reload' empfangen wurde
+    // if (role === 'reload') {
+    //   this.loadBooks();
+    // }
 
   }
 
@@ -125,4 +128,6 @@ export class LibraryPage implements OnInit {
       ...Array(emptyStars).fill('star-outline')
     ];
   }
+
+
 }
