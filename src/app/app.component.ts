@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { NetworkService } from './services/network.service';
-import { ToastController } from '@ionic/angular/standalone';
+import { ToastController, Platform } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { cloudOfflineOutline, cloudDoneOutline } from 'ionicons/icons';
+import { SplashScreen } from '@capacitor/splash-screen';
 
 @Component({
   selector: 'app-root',
@@ -14,9 +15,11 @@ export class AppComponent {
 
   constructor(
     private networkService: NetworkService,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private platform: Platform
   ) {
     addIcons({cloudOfflineOutline, cloudDoneOutline});
+    this.initializeApp();
   }
 
   ngOnInit() {
@@ -43,12 +46,24 @@ export class AppComponent {
   async showOnlineToast() {
     const toast = await this.toastCtrl.create({
       message: 'You are back online.',
-      duration: 2000,
+      duration: 1000,
       position: 'top',
       color: 'success',
       icon: 'cloud-done-outline'
     });
     toast.present();
   }
+
+  initializeApp() {
+    this.platform.ready().then(async () => {
+      if (this.platform.is('capacitor')) {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        await SplashScreen.hide({
+          fadeOutDuration: 300,
+        });
+      }
+    });
+  }
+
 
 }

@@ -30,6 +30,7 @@
     "@capacitor/local-notifications": "^7.0.4",
     "@capacitor/network": "^7.0.3",
     "@capacitor/preferences": "^7.0.3",
+    "@capacitor/splash-screen": "^7.0.4",
     "@capacitor/status-bar": "7.0.3",
     "@ionic/angular": "^8.0.0",
     "@supabase/supabase-js": "^2.86.2",
